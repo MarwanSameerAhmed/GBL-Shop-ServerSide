@@ -16,17 +16,42 @@ class CategoriesController extends Controller
 {
     public function GetCategories()
     {
-        $results = DB::select('SELECT DISTINCT mc.id, mc.category_name, mc.category_en_name, if(sc.id is null, 0, 1) as hasSubCategories, if(items.id is null, 0, 1) as hasSubItems from categories mc left join categories sc on mc.id=sc.parent_id LEFT JOIN items on mc.id=items.parent_id where mc.parent_id is null and (sc.id is not null or items.id is not null)');
-        return response()->json($this->DBCategoriesToArray($results), 200, [], JSON_UNESCAPED_UNICODE);
+       $results = DB::select('
+    SELECT DISTINCT
+        mc.id,
+        mc.category_name,
+        mc.category_en_name,
+        CASE WHEN sc.id IS NULL THEN 0 ELSE 1 END AS hasSubCategories,
+        CASE WHEN items.id IS NULL THEN 0 ELSE 1 END AS hasSubItems
+    FROM categories mc
+    LEFT JOIN categories sc ON mc.id = sc.parent_id
+    LEFT JOIN items ON mc.id = items.parent_id
+    WHERE mc.parent_id IS NULL
+      AND (sc.id IS NOT NULL OR items.id IS NOT NULL)
+');
+return response()->json($this->DBCategoriesToArray($results), 200, [], JSON_UNESCAPED_UNICODE);
+
     }
 
 
 
     public function GetSubCategories(Request $request, $categoryKey)
     {
-        $categoryID = base64_decode($categoryKey);
-        $results = DB::select('SELECT DISTINCT mc.id, mc.category_name, mc.category_en_name, if(sc.id is null, 0, 1) as hasSubCategories, if(items.id is null, 0, 1) as hasSubItems from categories mc left join categories sc on mc.id=sc.parent_id LEFT JOIN items on mc.id=items.parent_id where mc.parent_id = ?', [$categoryID]);
-        return response()->json($this->DBCategoriesToArray($results), 200, [], JSON_UNESCAPED_UNICODE);
+      $categoryID = base64_decode($categoryKey);
+$results = DB::select('
+    SELECT DISTINCT
+        mc.id,
+        mc.category_name,
+        mc.category_en_name,
+        CASE WHEN sc.id IS NULL THEN 0 ELSE 1 END AS hasSubCategories,
+        CASE WHEN items.id IS NULL THEN 0 ELSE 1 END AS hasSubItems
+    FROM categories mc
+    LEFT JOIN categories sc ON mc.id = sc.parent_id
+    LEFT JOIN items ON mc.id = items.parent_id
+    WHERE mc.parent_id = ?', [$categoryID]);
+
+return response()->json($this->DBCategoriesToArray($results), 200, [], JSON_UNESCAPED_UNICODE);
+
     }
 
 
@@ -77,7 +102,7 @@ class CategoriesController extends Controller
         return $arrayResult;
     }
 
-    
+
     public function CreateCategory(Request $request): JsonResponse
     {
         $validator = Validator::make(
