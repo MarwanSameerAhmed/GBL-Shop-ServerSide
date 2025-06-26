@@ -21,7 +21,7 @@ class CategoriesController extends Controller
         mc.id,
         mc.category_name,
         mc.category_en_name,
-        CASE WHEN sc.id IS NULL THEN 0 ELSE 1 END AS hasSubCategories,
+        CASE WHEN sc.id IS NULL THEN 0 ELSE 1 END AS has_subcategories,
         CASE WHEN items.id IS NULL THEN 0 ELSE 1 END AS hasSubItems
     FROM categories mc
     LEFT JOIN categories sc ON mc.id = sc.parent_id
@@ -43,7 +43,7 @@ $results = DB::select('
         mc.id,
         mc.category_name,
         mc.category_en_name,
-        CASE WHEN sc.id IS NULL THEN 0 ELSE 1 END AS hasSubCategories,
+        CASE WHEN sc.id IS NULL THEN 0 ELSE 1 END AS has_subcategories,
         CASE WHEN items.id IS NULL THEN 0 ELSE 1 END AS hasSubItems
     FROM categories mc
     LEFT JOIN categories sc ON mc.id = sc.parent_id
@@ -64,11 +64,11 @@ return response()->json($this->DBCategoriesToArray($results), 200, [], JSON_UNES
                 ->pluck('image_name')
                 ->first() ?? '';
             $arrayItem = [];
-            $routeController = $category->hasSubCategories == 1 ? 'Categories' : 'Items';
+            $routeController = $category->has_subcategories == 1 ? 'Categories' : 'Items';
             $arrayItem['route'] = '/' . $routeController . '/' . base64_encode($category->id);
             $arrayItem['name'] = $category->category_name;
             $arrayItem['en_name'] = $category->category_en_name;
-            $arrayItem['has_sub_categories'] = $category->hasSubCategories;
+            $arrayItem['has_sub_categories'] = $category->has_subcategories;
             $arrayItem['image'] = $image;
             return $arrayItem;
         }, $db_result);
