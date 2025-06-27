@@ -195,7 +195,7 @@ class ItemsController extends Controller
     private function SaveItemImage(string $imageName, string $imageData, int $recordId)
     {
         $path = 'images/' . $imageName;
-        Storage::disk('gbl_shop_serverside')->put($path, $imageData);
+        Storage::put($path, $imageData);
         Image::create([
             'image_name' => $imageName,
             'record_id' => $recordId,
