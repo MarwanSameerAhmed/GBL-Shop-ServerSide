@@ -77,7 +77,7 @@ class ItemsController extends Controller
                  ->orderBy('id', 'asc')
                  ->pluck('image_name')
                  ->first() ?? '';
-            if ($image !== '') $image = Storage::url('images/' . $image);
+            if ($image !== '') $image = Storage::url( $image);
 
             return [
                 'route' => '/Item/' . base64_encode($item->id),
@@ -102,7 +102,7 @@ class ItemsController extends Controller
                 ->skip(1)
                 ->take(10)
                 ->pluck('image_name')
-                ->map(fn($img) => Storage::url('images/' . $img))
+                ->map(fn($img) => Storage::url($img))
                 ->toArray();
 
             return [
@@ -188,14 +188,14 @@ class ItemsController extends Controller
         return response()->json([
             'state' => true,
             'data' => $item,
-            'image' => Storage::url('images/' . $file[0])
+            'image' => Storage::url( $file[0])
         ]);
     }
 
     private function SaveItemImage(string $imageName, string $imageData, int $recordId)
     {
         $path = 'images/' . $imageName;
-        Storage::disk('public')->put($path, $imageData);
+        Storage::disk('gbl_shop_serverside')->put($path, $imageData);
         Image::create([
             'image_name' => $imageName,
             'record_id' => $recordId,
