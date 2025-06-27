@@ -188,7 +188,7 @@ class ItemsController extends Controller
         return response()->json([
             'state' => true,
             'data' => $item,
-            'image' => Storage::get( $file[0])
+            'image' => Storage::url( $file[0])
         ]);
     }
 
