@@ -77,7 +77,7 @@ class ItemsController extends Controller
                  ->orderBy('id', 'asc')
                  ->pluck('image_name')
                  ->first() ?? '';
-            if ($image !== '') $image = Storage::url( $image);
+            if ($image !== '') $image = Storage::disk('public')->url($image);
 
             return [
                 'route' => '/Item/' . base64_encode($item->id),
@@ -102,7 +102,7 @@ class ItemsController extends Controller
                 ->skip(1)
                 ->take(10)
                 ->pluck('image_name')
-                ->map(fn($img) => Storage::url($img))
+                ->map(fn($img) => Storage::disk('public')->url($img))
                 ->toArray();
 
             return [
@@ -195,9 +195,9 @@ class ItemsController extends Controller
     private function SaveItemImage(string $imageName, string $imageData, int $recordId)
     {
         $path = 'images/' . $imageName;
-        Storage::put($path, $imageData);
+        Storage::disk('public')->put($path, $imageData);
         Image::create([
-            'image_name' => $imageName,
+            'image_name' => $path,
             'record_id' => $recordId,
             'is_category' => false,
         ]);
