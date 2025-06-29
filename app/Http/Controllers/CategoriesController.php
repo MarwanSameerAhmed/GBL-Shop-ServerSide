@@ -63,6 +63,7 @@ return response()->json($this->DBCategoriesToArray($results), 200, [], JSON_UNES
                 ->orderBy('id', 'asc')
                 ->pluck('image_name')
                 ->first() ?? '';
+            if ($image !== '') $image = Storage::disk('public')->url($image);
             $arrayItem = [];
             $routeController = $category->has_subcategories == 1 ? 'Categories' : 'Items';
             $arrayItem['route'] = '/' . $routeController . '/' . base64_encode($category->id);
@@ -155,20 +156,19 @@ return response()->json($this->DBCategoriesToArray($results), 200, [], JSON_UNES
         ]);
 
         $fileName = Str::uuid() . '.' . $extension;
-        $image = Image::create([
-            'image_name' => $fileName,
-            'record_id' => $category->id,
-            'is_category' => true,
-        ]);
-
         $path = 'images/' . $fileName;
 
         // تخزين الصورة
         Storage::disk('public')->put($path, $imageData);
+
+        $image = Image::create([
+            'image_name' => $path,
+            'record_id' => $category->id,
+            'is_category' => true,
+        ]);
         return response()->json([
             'state' => true,
             'data' => $category,
         ]);
     }
 }
-
