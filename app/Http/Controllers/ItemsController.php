@@ -222,4 +222,47 @@ class ItemsController extends Controller
         $savedImages[] = [$fileName, $imageData];
         return '';
     }
+
+    public function DeleteItem(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),[
+                'item_name' => 'required|string',
+            ],
+            [
+                'item_name.required' => 'يجب ارسال اسم المنتج المراد حذفه.',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        $item = Item::where('item_name', $request->item_name)->first();
+        if (!$item){
+            return response()->json([
+                'success' => false,
+                'errors' => "المنتج غير موجود",
+            ], 422, [], JSON_UNESCAPED_UNICODE);
+        }
+        $images = Image::where('record_id', $item->id)
+        ->where('is_category', false)
+        ->pluck('image_name')
+        ->toArray();
+
+        foreach($images as $image){
+                Storage::disk('public')->delete('images/' . $image);
+        }
+
+        Image::where('record_id', $item->id)->where('is_category', false)->delete();
+        $item->delete();
+
+        return response()->json([
+            'state' => true,
+            'data' => $item
+        ]);
+    }
 }

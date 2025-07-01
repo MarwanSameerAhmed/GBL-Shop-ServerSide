@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use App\Models\Category;
 use App\Models\Image;
+use App\Models\Item;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -169,6 +170,66 @@ return response()->json($this->DBCategoriesToArray($results), 200, [], JSON_UNES
         return response()->json([
             'state' => true,
             'data' => $category,
+        ]);
+    }
+
+    public function DeleteCategory(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),[
+                'category_name' => 'required|string',
+            ],
+            [
+                'category_name.required' => 'يجب ارسال اسم القسم المراد حذفه.',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        $category = Category::where('category_name', $request->category_name)->first();
+        if (!$category){
+            return response()->json([
+                'success' => false,
+                'errors' => "القسم غير موجود",
+            ], 422, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        $sub_category = Category::where('parent_id', $category->id)->first();
+        if ($sub_category){
+            return response()->json([
+                'success' => false,
+                'errors' => "يجب حذف جميع الأقسام الفرعية اولا",
+            ], 422, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        $item = Item::where('parent_id', $category->id)->first();
+        if ($item){
+            return response()->json([
+                'success' => false,
+                'errors' => "يجب حذف جميع المنتجات اولا",
+            ], 422, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        $images = Image::where('record_id', $category->id)
+        ->where('is_category', true)
+        ->pluck('image_name')
+        ->toArray();
+
+        foreach($images as $image){
+                Storage::disk('public')->delete('images/' . $image);
+        }
+
+        Image::where('record_id', $category->id)->where('is_category', false)->delete();
+        $category->delete();
+
+        return response()->json([
+            'state' => true,
+            'data' => $category
         ]);
     }
 }
