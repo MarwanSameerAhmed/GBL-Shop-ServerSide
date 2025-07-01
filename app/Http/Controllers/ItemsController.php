@@ -254,8 +254,12 @@ class ItemsController extends Controller
         ->toArray();
 
         foreach($images as $image){
-                Storage::disk('public')->delete('images/' . $image);
-        }
+            if(!Storage::disk('public')->delete('images/' . $image)){
+                return response()->json([
+                    'success' => false,
+                    'errors' => "فشلت عمليت حذف الصورة",
+                ], 422, [], JSON_UNESCAPED_UNICODE);
+            }        }
 
         Image::where('record_id', $item->id)->where('is_category', false)->delete();
         $item->delete();

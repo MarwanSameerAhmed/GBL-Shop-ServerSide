@@ -221,8 +221,12 @@ return response()->json($this->DBCategoriesToArray($results), 200, [], JSON_UNES
         ->toArray();
 
         foreach($images as $image){
-                Storage::disk('public')->delete('images/' . $image);
-        }
+            if(!Storage::disk('public')->delete('images/' . $image)){
+                return response()->json([
+                    'success' => false,
+                    'errors' => "فشلت عمليت حذف الصورة",
+                ], 422, [], JSON_UNESCAPED_UNICODE);
+            }        }
 
         Image::where('record_id', $category->id)->where('is_category', false)->delete();
         $category->delete();
