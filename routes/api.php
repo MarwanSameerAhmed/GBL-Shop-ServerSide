@@ -24,3 +24,6 @@ Route::get('/Categories/GetMainCategories', CategoriesController::class . '@GetA
 Route::get('/Categories/GetSubCategories', CategoriesController::class . '@GetApiSubCategories');
 Route::post('/Categories/CreateCategory', CategoriesController::class . '@CreateCategory');
 Route::post('/Items/CreateItem', ItemsController::class . '@CreateItem');
+Route::post('/Items/DeleteItem', ItemsController::class . '@DeleteItem');
+Route::post('/Categories/DeleteCategory', CategoriesController::class . '@DeleteCategory');
+

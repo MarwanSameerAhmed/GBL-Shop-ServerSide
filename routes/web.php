@@ -25,6 +25,4 @@ Route::get('/Categories/{key}', CategoriesController::class . '@GetSubCategories
 Route::get('/Items/Search/', ItemsController::class . '@Search');
 Route::get('/Items/{key}', ItemsController::class . '@GetItems');
 Route::get('/Item/{key}', ItemsController::class . '@GetItem');
-Route::post('/Items/DeleteItem', ItemsController::class . '@DeleteItem');
-Route::post('/Categories/DeleteCategory', CategoriesController::class . '@DeleteCategory');
 
