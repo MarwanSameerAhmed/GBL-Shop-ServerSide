@@ -103,6 +103,8 @@ class CategoriesApiController extends Controller
 
         $fileName = Str::uuid() . '.' . $extension;
         $path = 'images/' . $fileName;
+        if($category->parent_id == null)
+        $category->parent_id = 0;
 
         // تخزين الصورة
         Storage::disk('public')->put($path, $imageData);
