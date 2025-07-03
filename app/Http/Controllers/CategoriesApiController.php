@@ -41,7 +41,7 @@ class CategoriesApiController extends Controller
                     'parent_id' => $item->parent_id,
                     'category_name' => $item->category_name,
                     'category_en_name' => $item->category_en_name,
-                    'image_url' => $item->image_name ? Storage::disk('public')->url('images/' . $item->image_name) : null,
+                    'image_url' => $item->image_name ? Storage::disk('public')->url( $item->image_name) : null,
                     'has_sub_categories' => (bool) $item->has_sub_categories,
                     'has_items' => (bool) $item->has_items,
                 ];
@@ -49,7 +49,7 @@ class CategoriesApiController extends Controller
 
         return response()->json($categories);
     }
-    
+
     public function CreateCategory(Request $request): JsonResponse
     {
         $validator = Validator::make(
@@ -165,8 +165,8 @@ class CategoriesApiController extends Controller
         $images = Image::where('record_id', $category->id)
         ->where('is_category', true)
         ->pluck('image_name')
-        ->toArray();  
-        
+        ->toArray();
+
         foreach($images as $image){
             if(!Storage::disk('public')->delete('images/' . $image)){
                 return response()->json([
