@@ -50,7 +50,7 @@ class CategoriesApiController extends Controller
         return response()->json($categories);
     }
 
-    public function CreateCategory(Request $request): JsonResponse
+  public function CreateCategory(Request $request): JsonResponse
     {
         $validator = Validator::make(
             $request->all(),
@@ -102,18 +102,16 @@ class CategoriesApiController extends Controller
         ]);
 
         $fileName = Str::uuid() . '.' . $extension;
-        $image = Image::create([
-            'image_name' => $fileName,
-            'record_id' => $category->id,
-            'is_category' => true,
-        ]);
-
         $path = 'images/' . $fileName;
-        if ($category->parent_id == null)
-            $category->parent_id = 0;
 
         // تخزين الصورة
         Storage::disk('public')->put($path, $imageData);
+
+        $image = Image::create([
+            'image_name' => $path,
+            'record_id' => $category->id,
+            'is_category' => true,
+        ]);
         return response()->json([
             'state' => true,
             'data' => $category,
