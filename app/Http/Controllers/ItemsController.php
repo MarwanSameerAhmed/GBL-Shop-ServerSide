@@ -21,7 +21,7 @@ class ItemsController extends Controller
         if ($itemName == null) return response()->json([], 200, [], JSON_UNESCAPED_UNICODE);
         if ($language == 'ar'){
             $itemName = ArabicTextProcessor::processArabicText($itemName);
-            $itemName = trim(str_replace(['مكينة', 'مكاين', 'اله'], '', $itemName));
+            $itemName = trim(str_replace(['مكينه', 'مكاين', 'اله'], '', $itemName));
         }
         $names = explode(' ', $itemName);
 
@@ -268,5 +268,19 @@ class ItemsController extends Controller
             'state' => true,
             'data' => $item
         ]);
+    }
+
+
+    public function GetLastItems(Request $request)
+    {
+        $results = DB::select('
+    SELECT id, item_name, item_en_name, item_short_description, item_en_short_description,
+    CASE WHEN price IS NULL THEN -1 ELSE price END AS price
+    FROM items
+    ORDER BY id DESC
+    LIMIT 4
+');
+
+        return response()->json($this->DBItemsToArray($results), 200, [], JSON_UNESCAPED_UNICODE);
     }
 }
